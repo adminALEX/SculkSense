@@ -19,13 +19,13 @@ Fast, local AI pre-commit review using Ollama. Zero API costs. Your code never l
 ## Install
 
 ```bash
-npm install --save-dev sculk-sense
+npm install --save-dev skulksense
 ```
 
 ## Quick Start
 
 ```bash
-npx sculk-sense init
+npx skulksense init
 ```
 
 This will:
@@ -33,7 +33,7 @@ This will:
 - Detect your Git repository
 - Install/configure Husky if needed
 - Create `.husky/pre-commit`
-- Create `sculk-sense.config.json`
+- Create `skulksense.config.json`
 - Verify Ollama and the configured model
 
 Then commit as usual:
@@ -47,15 +47,15 @@ git commit -m "feat: add user service"
 
 | Command | Description |
 |---------|-------------|
-| `sculk-sense init` | Initialize in the current repo |
-| `sculk-sense review` | Run review manually on staged changes |
-| `sculk-sense doctor` | Check Git, Husky, Ollama, config, model |
-| `sculk-sense version` | Show package version |
-| `sculk-sense --help` | Show help |
+| `skulksense init` | Initialize in the current repo |
+| `skulksense review` | Run review manually on staged changes |
+| `skulksense doctor` | Check Git, Husky, Ollama, config, model |
+| `skulksense version` | Show package version |
+| `skulksense --help` | Show help |
 
 ## Configuration
 
-Create `sculk-sense.config.json` in your project root:
+Create `skulksense.config.json` in your project root:
 
 ```json
 {

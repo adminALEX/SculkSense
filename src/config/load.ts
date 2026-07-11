@@ -1,7 +1,7 @@
 import { cosmiconfig } from 'cosmiconfig';
 import { DEFAULT_CONFIG, type SculkSenseConfig } from './defaults.js';
 
-const explorer = cosmiconfig('sculk-sense');
+const explorer = cosmiconfig('skulksense');
 
 export async function loadConfig(
   cwd: string = process.cwd(),
@@ -23,5 +23,5 @@ export async function loadConfig(
 }
 
 export function getConfigFilename(): string {
-  return 'sculk-sense.config.json';
+  return 'skulksense.config.json';
 }

@@ -20,7 +20,7 @@ function getPackageVersion(): string {
 const program = new Command();
 
 program
-  .name('sculk-sense')
+  .name('skulksense')
   .description('Fast local AI pre-commit review using Ollama')
   .version(getPackageVersion());
 

@@ -1,10 +1,10 @@
 {
-  "name": "sculk-sense",
+  "name": "skulksense",
   "version": "0.1.0",
   "description": "Fast local AI pre-commit review using Ollama — zero API costs, complete code privacy",
   "type": "module",
   "bin": {
-    "sculk-sense": "./dist/cli.js"
+    "skulksense": "./dist/cli.js"
   },
   "files": [
     "dist"
