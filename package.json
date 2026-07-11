@@ -1,0 +1,61 @@
+{
+  "name": "sculk-sense",
+  "version": "0.1.0",
+  "description": "Fast local AI pre-commit review using Ollama — zero API costs, complete code privacy",
+  "type": "module",
+  "bin": {
+    "sculk-sense": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src tests",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "git",
+    "pre-commit",
+    "husky",
+    "ollama",
+    "ai",
+    "code-review",
+    "cli",
+    "local-llm"
+  ],
+  "author": "adminALEX",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adminALEX/SculkSense.git"
+  },
+  "homepage": "https://github.com/adminALEX/SculkSense#readme",
+  "bugs": {
+    "url": "https://github.com/adminALEX/SculkSense/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "cosmiconfig": "^9.0.0",
+    "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "eslint": "^9.22.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8"
+  }
+}
