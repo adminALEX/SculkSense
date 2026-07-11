@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-07-12
+
+### Fixed
+
+- Husky pre-commit hook falls back to global `skulksense` when the package is not installed locally
+
 ## [0.2.1] - 2026-07-12
 
 ### Added
