@@ -1,6 +1,6 @@
 {
   "name": "skulksense",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Fast local AI pre-commit review using Ollama — zero API costs, complete code privacy",
   "type": "module",
   "bin": {

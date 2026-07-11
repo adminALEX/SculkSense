@@ -47,6 +47,12 @@ describe('pre-commit hook', () => {
     const hook = getPreCommitHookContent();
     expect(hook).toContain('.skulksense/disabled');
     expect(hook).toContain('exit 0');
-    expect(hook).toContain('skulksense/dist/cli.js review');
+    expect(hook).toContain('node_modules/skulksense/dist/cli.js');
+  });
+
+  it('falls back to global skulksense when local install is missing', () => {
+    const hook = getPreCommitHookContent();
+    expect(hook).toContain('command -v skulksense');
+    expect(hook).toContain('skulksense review');
   });
 });

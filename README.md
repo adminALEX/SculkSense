@@ -24,6 +24,14 @@ Fast, local AI pre-commit review using Ollama. Zero API costs. Your code never l
 npm install --save-dev skulksense
 ```
 
+For personal use on team repos, you can install globally instead:
+
+```bash
+npm install -g skulksense
+```
+
+The Husky hook uses the local package when present, otherwise falls back to `skulksense` on your `PATH`.
+
 ## Quick Start
 
 ```bash
