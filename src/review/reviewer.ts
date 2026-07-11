@@ -11,6 +11,7 @@ import { filterReviewableFiles } from './filters.js';
 import { parseReviewResponse, type ReviewResult } from './parser.js';
 import { buildReviewPrompt } from './prompt.js';
 import { truncateDiff } from './truncate.js';
+import { findStaticIssues, verifyFailReason } from './verify.js';
 
 export type ReviewOutcome = ReviewResult & {
   durationMs: number;
@@ -71,15 +72,25 @@ export async function reviewStagedChanges(
     };
   }
 
+  const truncatedDiff = truncateDiff(diff, config.maxDiffChars);
+  const staticIssue = findStaticIssues(truncatedDiff);
+
+  if (staticIssue) {
+    return {
+      status: 'fail',
+      reason: staticIssue,
+      durationMs: Date.now() - start,
+      model: config.model,
+    };
+  }
+
   try {
     let modelWarmupMs = 0;
     if (!(await isModelLoaded(config.model))) {
       modelWarmupMs = await warmModel(config.model);
     }
 
-    const prompt = buildReviewPrompt(
-      truncateDiff(diff, config.maxDiffChars),
-    );
+    const prompt = buildReviewPrompt(truncatedDiff);
     const response = await generate(
       {
         model: config.model,
@@ -92,6 +103,19 @@ export async function reviewStagedChanges(
     );
 
     const parsed = parseReviewResponse(response.response);
+
+    if (
+      parsed.status === 'fail' &&
+      !verifyFailReason(parsed.reason, truncatedDiff)
+    ) {
+      return {
+        status: 'pass',
+        durationMs: Date.now() - start,
+        model: config.model,
+        modelWarmupMs: modelWarmupMs || undefined,
+      };
+    }
+
     return {
       ...parsed,
       durationMs: Date.now() - start,

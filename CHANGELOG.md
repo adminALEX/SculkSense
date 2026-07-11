@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config via `skulksense.config.json`
 - Skip logic for infrastructure failures
 
+## [0.1.9] - 2026-07-12
+
+### Fixed
+
+- Verify AI fail reasons against the actual staged diff to block false positives
+- Detect console.log and debugger deterministically from added diff lines
+
 ## [0.1.8] - 2026-07-12
 
 ### Fixed
