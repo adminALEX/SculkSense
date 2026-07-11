@@ -6,6 +6,17 @@ export async function getStagedDiff(
   return runGit(['diff', '--cached', '--unified=0'], cwd);
 }
 
+export async function getStagedDiffForFiles(
+  files: string[],
+  cwd: string = process.cwd(),
+): Promise<string> {
+  if (files.length === 0) {
+    return '';
+  }
+
+  return runGit(['diff', '--cached', '--unified=0', '--', ...files], cwd);
+}
+
 export function countChangedLines(diff: string): number {
   if (!diff) return 0;
 

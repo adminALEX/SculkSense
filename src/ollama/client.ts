@@ -4,6 +4,7 @@ export type OllamaGenerateRequest = {
   model: string;
   prompt: string;
   stream: false;
+  keep_alive?: string;
   options?: {
     temperature?: number;
     num_predict?: number;

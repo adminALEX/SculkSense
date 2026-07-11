@@ -77,6 +77,10 @@ export function logReviewOutcome(
     parts.push(`model=${outcome.model}`);
   }
 
+  if (outcome.modelWarmupMs) {
+    parts.push(`modelLoad=${outcome.modelWarmupMs}ms`);
+  }
+
   if (outcome.status === 'fail' || outcome.status === 'skip') {
     parts.push(`reason="${outcome.reason}"`);
   }

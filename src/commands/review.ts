@@ -1,10 +1,15 @@
 import { loadConfig } from '../config/load.js';
 import { isGitRepository } from '../git/run.js';
+import {
+  ensureOptimalPreCommitHook,
+  isCommitHookContext,
+} from '../git/upgrade.js';
 import { logReviewOutcome, logReviewStart } from '../logging/fileLogger.js';
 import { reviewStagedChanges } from '../review/reviewer.js';
 import { colors } from '../ui/colors.js';
 import { logger } from '../ui/logger.js';
 import { createSpinner } from '../ui/spinner.js';
+import { isModelLoaded } from '../ollama/warmup.js';
 
 export async function reviewCommand(): Promise<void> {
   const cwd = process.cwd();
@@ -18,9 +23,15 @@ export async function reviewCommand(): Promise<void> {
   }
 
   const config = await loadConfig(cwd);
-  const spinner = createSpinner('Reviewing staged changes...');
+  ensureOptimalPreCommitHook(cwd);
 
-  logReviewStart(cwd, process.env.HUSKY ? 'commit' : 'manual');
+  let spinner = createSpinner('Reviewing staged changes...');
+  if (!(await isModelLoaded(config.model))) {
+    spinner.stop();
+    spinner = createSpinner('Loading Ollama model (first run may take a moment)...');
+  }
+
+  logReviewStart(cwd, isCommitHookContext() ? 'commit' : 'manual');
 
   const outcome = await reviewStagedChanges(config, cwd);
   logReviewOutcome(outcome, cwd);
@@ -53,4 +64,8 @@ export async function reviewCommand(): Promise<void> {
   console.log('');
   logger.dim('Time:');
   console.log(`${outcome.durationMs} ms`);
+  if (outcome.modelWarmupMs) {
+    logger.dim('Model load:');
+    console.log(`${outcome.modelWarmupMs} ms`);
+  }
 }

@@ -1,10 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const PRE_COMMIT_HOOK = `#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-npx skulksense review
+const PRE_COMMIT_HOOK = `node ./node_modules/skulksense/dist/cli.js review
 `;
 
 export function hasHusky(cwd: string = process.cwd()): boolean {

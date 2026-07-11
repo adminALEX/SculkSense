@@ -62,6 +62,7 @@ export async function initCommand(): Promise<void> {
           model: DEFAULT_CONFIG.model,
           timeout: DEFAULT_CONFIG.timeout,
           minChangedLines: DEFAULT_CONFIG.minChangedLines,
+          maxDiffChars: DEFAULT_CONFIG.maxDiffChars,
           ignore: [...DEFAULT_CONFIG.ignore],
         },
         null,

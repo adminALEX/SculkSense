@@ -16,6 +16,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config via `skulksense.config.json`
 - Skip logic for infrastructure failures
 
+## [0.1.7] - 2026-07-12
+
+### Fixed
+
+- Zero-config: auto-upgrade outdated Husky hooks on review (no manual hook edits)
+- Zero-config: enforce safe minimum timeout and always merge default ignore patterns
+- Detect commit context via Husky env vars for accurate logs
+
+## [0.1.6] - 2026-07-12
+
+### Fixed
+
+- Pre-warm Ollama model when unloaded (fixes timeouts on small diffs after idle)
+- Increase default review timeout to 10s; model load uses a separate 60s window
+- Show "Loading Ollama model..." spinner on first run
+
+## [0.1.5] - 2026-07-12
+
+### Fixed
+
+- Send only non-ignored file diffs to Ollama (fixes timeouts on lockfile commits)
+- Truncate very large diffs with `maxDiffChars` (default 4000)
+- Use faster Husky hook (`skulksense review` instead of `npx`)
+- Keep model warm with `keep_alive` and shorter `num_predict` for PASS/FAIL
+
+## [0.1.4] - 2026-07-12
+
+### Changed
+
+- Increase default AI review timeout from 3s to 5s to reduce false skips
+
 ## [0.1.3] - 2026-07-12
 
 ### Changed

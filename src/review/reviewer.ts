@@ -1,15 +1,21 @@
 import type { SculkSenseConfig } from '../config/defaults.js';
-import { countChangedLines, getStagedDiff } from '../git/diff.js';
+import {
+  countChangedLines,
+  getStagedDiffForFiles,
+} from '../git/diff.js';
 import { getStagedFiles } from '../git/stagedFiles.js';
 import { generate } from '../ollama/client.js';
 import { isOllamaInstalled, isOllamaRunning } from '../ollama/health.js';
+import { isModelLoaded, warmModel } from '../ollama/warmup.js';
 import { filterReviewableFiles } from './filters.js';
 import { parseReviewResponse, type ReviewResult } from './parser.js';
 import { buildReviewPrompt } from './prompt.js';
+import { truncateDiff } from './truncate.js';
 
 export type ReviewOutcome = ReviewResult & {
   durationMs: number;
   model?: string;
+  modelWarmupMs?: number;
 };
 
 export async function reviewStagedChanges(
@@ -54,7 +60,7 @@ export async function reviewStagedChanges(
     };
   }
 
-  const diff = await getStagedDiff(cwd);
+  const diff = await getStagedDiffForFiles(reviewableFiles, cwd);
   const changedLines = countChangedLines(diff);
 
   if (changedLines < config.minChangedLines) {
@@ -66,13 +72,21 @@ export async function reviewStagedChanges(
   }
 
   try {
-    const prompt = buildReviewPrompt(diff);
+    let modelWarmupMs = 0;
+    if (!(await isModelLoaded(config.model))) {
+      modelWarmupMs = await warmModel(config.model);
+    }
+
+    const prompt = buildReviewPrompt(
+      truncateDiff(diff, config.maxDiffChars),
+    );
     const response = await generate(
       {
         model: config.model,
         prompt,
         stream: false,
-        options: { temperature: 0, num_predict: 128 },
+        keep_alive: '5m',
+        options: { temperature: 0, num_predict: 32 },
       },
       config.timeout,
     );
@@ -82,6 +96,7 @@ export async function reviewStagedChanges(
       ...parsed,
       durationMs: Date.now() - start,
       model: config.model,
+      modelWarmupMs: modelWarmupMs || undefined,
     };
   } catch (error) {
     const message =
