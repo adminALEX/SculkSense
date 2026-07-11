@@ -6,6 +6,7 @@ import {
 } from '../git/upgrade.js';
 import { logReviewOutcome, logReviewStart } from '../logging/fileLogger.js';
 import { reviewStagedChanges } from '../review/reviewer.js';
+import { isReviewStopped } from '../state/disabled.js';
 import { colors } from '../ui/colors.js';
 import { logger } from '../ui/logger.js';
 import { createSpinner } from '../ui/spinner.js';
@@ -20,6 +21,10 @@ export async function reviewCommand(): Promise<void> {
   if (!isGit) {
     logger.error('Error: Not a Git repository.');
     process.exit(1);
+  }
+
+  if (isReviewStopped(cwd)) {
+    process.exit(0);
   }
 
   const config = await loadConfig(cwd);

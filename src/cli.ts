@@ -9,6 +9,8 @@ import { doctorCommand } from './commands/doctor.js';
 import { versionCommand } from './commands/version.js';
 import { logCommand } from './commands/log.js';
 import { listenCommand } from './commands/listen.js';
+import { stopCommand } from './commands/stop.js';
+import { startCommand } from './commands/start.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -59,5 +61,15 @@ program
   .description('Watch review logs in real time during commits')
   .option('-n, --lines <count>', 'preview recent lines before listening', '10')
   .action(listenCommand);
+
+program
+  .command('stop')
+  .description('Pause SkulkSense and stop Ollama for this repository')
+  .action(stopCommand);
+
+program
+  .command('start')
+  .description('Resume SkulkSense pre-commit reviews for this repository')
+  .action(startCommand);
 
 program.parse();

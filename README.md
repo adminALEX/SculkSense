@@ -10,6 +10,7 @@ Fast, local AI pre-commit review using Ollama. Zero API costs. Your code never l
 - **Non-blocking** — skips review when Ollama is unavailable
 - **Custom rules** — project-specific instructions or markdown rules file
 - **Husky-ready** — one-command setup
+- **Pause anytime** — `skulksense stop` skips reviews and stops Ollama without uninstalling
 
 ## Requirements
 
@@ -54,6 +55,8 @@ git commit -m "feat: add user service"
 | `skulksense doctor` | Check Git, Husky, Ollama, config, model |
 | `skulksense log` | View recent review logs |
 | `skulksense listen` | Watch logs in real time during commits |
+| `skulksense stop` | Pause reviews for this repo and stop Ollama |
+| `skulksense start` | Resume pre-commit reviews for this repo |
 | `skulksense version` | Show package version |
 | `skulksense --help` | Show help |
 
@@ -150,6 +153,26 @@ Example `.skulksense-rules.md`:
 ```
 
 Custom rules are merged with built-in checks during every review.
+
+## Pausing SkulkSense
+
+To temporarily disable pre-commit reviews **in the current repo only** (without uninstalling or leaving the project):
+
+```bash
+npx skulksense stop
+```
+
+This will:
+
+- Create `.skulksense/disabled` so the Husky hook exits immediately
+- Stop any running Ollama process
+- Leave config, hooks, and logs in place
+
+Commits behave as if SkulkSense were not installed. Resume anytime:
+
+```bash
+npx skulksense start
+```
 
 ## What It Checks
 

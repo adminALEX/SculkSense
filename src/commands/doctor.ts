@@ -6,6 +6,7 @@ import { hasHusky, getPreCommitHookPath } from '../git/husky.js';
 import { isGitRepository } from '../git/run.js';
 import { isOllamaInstalled, isOllamaRunning } from '../ollama/health.js';
 import { hasModel } from '../ollama/models.js';
+import { isReviewStopped } from '../state/disabled.js';
 import { logger } from '../ui/logger.js';
 
 type CheckResult = { name: string; pass: boolean; detail?: string };
@@ -95,6 +96,13 @@ export async function doctorCommand(): Promise<void> {
 
   const allPass = checks.every((c) => c.pass);
   console.log('');
+
+  if (isReviewStopped(cwd)) {
+    logger.warn('SkulkSense is paused in this repository.');
+    logger.info('Pre-commit reviews are skipped. Run `skulksense start` to resume.');
+    console.log('');
+  }
+
   if (allPass) {
     logger.success('All checks passed.');
   } else {
