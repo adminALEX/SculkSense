@@ -7,14 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-07-12
+
 ### Added
 
-- Initial project scaffold
-- CLI commands: `init`, `review`, `doctor`, `version`
-- Ollama integration for local AI review
-- Husky pre-commit hook setup
-- Config via `skulksense.config.json`
-- Skip logic for infrastructure failures
+- `skulksense stop` — pause pre-commit reviews for the current repo and stop Ollama
+- `skulksense start` — resume pre-commit reviews for the current repo
+- Husky hook skips review when `.skulksense/disabled` exists
+- Doctor reports when SkulkSense is paused in the repository
 
 ## [0.2.0] - 2026-07-12
 
