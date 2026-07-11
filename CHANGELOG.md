@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config via `skulksense.config.json`
 - Skip logic for infrastructure failures
 
+## [0.1.8] - 2026-07-12
+
+### Fixed
+
+- Tune review prompt to correctly detect console.log and avoid false "missing await" reports
+
 ## [0.1.7] - 2026-07-12
 
 ### Fixed
