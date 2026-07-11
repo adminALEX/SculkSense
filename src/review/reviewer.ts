@@ -11,7 +11,7 @@ import { filterReviewableFiles } from './filters.js';
 import { parseReviewResponse, type ReviewResult } from './parser.js';
 import { buildReviewPrompt } from './prompt.js';
 import { truncateDiff } from './truncate.js';
-import { findStaticIssues, verifyFailReason } from './verify.js';
+import { findStaticIssues, verifyFailReason, enrichFailReason } from './verify.js';
 
 export type ReviewOutcome = ReviewResult & {
   durationMs: number;
@@ -110,6 +110,16 @@ export async function reviewStagedChanges(
     ) {
       return {
         status: 'pass',
+        durationMs: Date.now() - start,
+        model: config.model,
+        modelWarmupMs: modelWarmupMs || undefined,
+      };
+    }
+
+    if (parsed.status === 'fail') {
+      return {
+        status: 'fail',
+        reason: enrichFailReason(parsed.reason, truncatedDiff),
         durationMs: Date.now() - start,
         model: config.model,
         modelWarmupMs: modelWarmupMs || undefined,

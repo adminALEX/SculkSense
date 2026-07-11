@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config via `skulksense.config.json`
 - Skip logic for infrastructure failures
 
+## [0.1.10] - 2026-07-12
+
+### Fixed
+
+- Show exact `file:line` locations parsed from the staged diff on failures
+
 ## [0.1.9] - 2026-07-12
 
 ### Fixed
