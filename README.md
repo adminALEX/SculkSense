@@ -8,6 +8,7 @@ Fast, local AI pre-commit review using Ollama. Zero API costs. Your code never l
 - **Fast** — typical reviews under 2 seconds
 - **Local only** — staged diffs reviewed via Ollama on localhost
 - **Non-blocking** — skips review when Ollama is unavailable
+- **Custom rules** — project-specific instructions or markdown rules file
 - **Husky-ready** — one-command setup
 
 ## Requirements
@@ -30,6 +31,7 @@ npx skulksense init
 
 This will:
 
+- Ask for optional custom review rules (inline or markdown file)
 - Detect your Git repository
 - Install/configure Husky if needed
 - Create `.husky/pre-commit`
@@ -116,6 +118,38 @@ Create `skulksense.config.json` in your project root:
   ]
 }
 ```
+
+### Custom review rules
+
+During `skulksense init`, you can add project-specific rules:
+
+1. **Inline instructions** — stored in `customInstructions` in config
+2. **Markdown rules file** — path stored as `rulesFile` (default: `.skulksense-rules.md`)
+
+Example config with custom rules:
+
+```json
+{
+  "model": "qwen2.5-coder:1.5b",
+  "timeout": 10000,
+  "minChangedLines": 5,
+  "maxDiffChars": 4000,
+  "rulesFile": ".skulksense-rules.md",
+  "customInstructions": "Reject commits that add hardcoded API URLs."
+}
+```
+
+Example `.skulksense-rules.md`:
+
+```markdown
+# SkulkSense Review Rules
+
+- Never commit `fetch` calls without error handling
+- React hooks must follow the rules of hooks
+- Do not add new `any` types in TypeScript files
+```
+
+Custom rules are merged with built-in checks during every review.
 
 ## What It Checks
 

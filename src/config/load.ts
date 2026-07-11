@@ -25,7 +25,7 @@ function resolveTimeout(userTimeout?: number): number {
 export function resolveConfig(
   partial?: Partial<SculkSenseConfig>,
 ): SculkSenseConfig {
-  return {
+  const config: SculkSenseConfig = {
     model: partial?.model ?? DEFAULT_CONFIG.model,
     timeout: resolveTimeout(partial?.timeout),
     minChangedLines:
@@ -33,6 +33,16 @@ export function resolveConfig(
     maxDiffChars: partial?.maxDiffChars ?? DEFAULT_CONFIG.maxDiffChars,
     ignore: mergeIgnorePatterns(partial?.ignore),
   };
+
+  if (partial?.customInstructions?.trim()) {
+    config.customInstructions = partial.customInstructions.trim();
+  }
+
+  if (partial?.rulesFile?.trim()) {
+    config.rulesFile = partial.rulesFile.trim();
+  }
+
+  return config;
 }
 
 export async function loadConfig(

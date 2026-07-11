@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadConfig, getConfigFilename } from '../config/load.js';
+import { loadCustomRulesText } from '../config/rules.js';
 import { hasHusky, getPreCommitHookPath } from '../git/husky.js';
 import { isGitRepository } from '../git/run.js';
 import { isOllamaInstalled, isOllamaRunning } from '../ollama/health.js';
@@ -70,6 +71,16 @@ export async function doctorCommand(): Promise<void> {
     name: 'Model',
     pass: modelPass,
     detail: modelDetail || undefined,
+  });
+
+  const config = await loadConfig(cwd);
+  const customRules = loadCustomRulesText(config, cwd);
+  checks.push({
+    name: 'Custom rules',
+    pass: true,
+    detail: customRules
+      ? config.rulesFile ?? 'inline instructions'
+      : 'not configured (optional)',
   });
 
   for (const check of checks) {

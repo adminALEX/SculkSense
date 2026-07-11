@@ -1,9 +1,13 @@
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { DEFAULT_CONFIG } from '../config/defaults.js';
-import { getConfigFilename } from '../config/load.js';
+import { getConfigFilename, resolveConfig } from '../config/load.js';
+import type { SculkSenseConfig } from '../config/defaults.js';
+import {
+  ensureRulesFile,
+  loadRulesFile,
+} from '../config/rules.js';
 import {
   getPreCommitHookContent,
   getPreCommitHookPath,
@@ -14,8 +18,43 @@ import { isOllamaInstalled, isOllamaRunning } from '../ollama/health.js';
 import { hasModel } from '../ollama/models.js';
 import { ensureLogDir, getLogPath } from '../logging/fileLogger.js';
 import { logger } from '../ui/logger.js';
+import { promptCustomRules } from '../ui/promptUser.js';
 
 const execFileAsync = promisify(execFile);
+
+function readExistingConfig(cwd: string): Partial<SculkSenseConfig> {
+  const configPath = join(cwd, getConfigFilename());
+  if (!existsSync(configPath)) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(readFileSync(configPath, 'utf-8')) as Partial<SculkSenseConfig>;
+  } catch {
+    return {};
+  }
+}
+
+function writeConfig(cwd: string, config: SculkSenseConfig): void {
+  const configPath = join(cwd, getConfigFilename());
+  const output: Record<string, unknown> = {
+    model: config.model,
+    timeout: config.timeout,
+    minChangedLines: config.minChangedLines,
+    maxDiffChars: config.maxDiffChars,
+    ignore: config.ignore,
+  };
+
+  if (config.customInstructions) {
+    output.customInstructions = config.customInstructions;
+  }
+
+  if (config.rulesFile) {
+    output.rulesFile = config.rulesFile;
+  }
+
+  writeFileSync(configPath, JSON.stringify(output, null, 2) + '\n');
+}
 
 export async function initCommand(): Promise<void> {
   const cwd = process.cwd();
@@ -29,6 +68,25 @@ export async function initCommand(): Promise<void> {
     process.exit(1);
   }
   logger.success('✓ Git repository detected');
+
+  const customRulesInput = await promptCustomRules();
+  const existing = readExistingConfig(cwd);
+  const config = resolveConfig({
+    ...existing,
+    ...customRulesInput,
+  });
+
+  if (config.rulesFile) {
+    const createdPath = ensureRulesFile(config.rulesFile, cwd);
+    if (loadRulesFile(config.rulesFile, cwd)) {
+      logger.success(`✓ Rules file ready (${config.rulesFile})`);
+      logger.dim(`  ${createdPath}`);
+    }
+  }
+
+  if (config.customInstructions) {
+    logger.success('✓ Custom instructions saved to config');
+  }
 
   const huskyPresent = hasHusky(cwd);
   if (!huskyPresent) {
@@ -53,29 +111,11 @@ export async function initCommand(): Promise<void> {
   writeFileSync(hookPath, getPreCommitHookContent(), { mode: 0o755 });
   logger.success('✓ Pre-commit hook created');
 
-  const configPath = join(cwd, getConfigFilename());
-  if (!existsSync(configPath)) {
-    writeFileSync(
-      configPath,
-      JSON.stringify(
-        {
-          model: DEFAULT_CONFIG.model,
-          timeout: DEFAULT_CONFIG.timeout,
-          minChangedLines: DEFAULT_CONFIG.minChangedLines,
-          maxDiffChars: DEFAULT_CONFIG.maxDiffChars,
-          ignore: [...DEFAULT_CONFIG.ignore],
-        },
-        null,
-        2,
-      ) + '\n',
-    );
-    logger.success(`✓ Config created (${getConfigFilename()})`);
-  } else {
-    logger.info(`• Config already exists (${getConfigFilename()})`);
-  }
+  writeConfig(cwd, config);
+  logger.success(`✓ Config saved (${getConfigFilename()})`);
 
   ensureLogDir(cwd);
-  logger.success(`✓ Logs stored in user directory`);
+  logger.success('✓ Logs stored in user directory');
   logger.dim(`  ${getLogPath(cwd)}`);
 
   const ollamaInstalled = await isOllamaInstalled();
@@ -90,12 +130,12 @@ export async function initCommand(): Promise<void> {
     if (running) {
       logger.success('✓ Ollama running');
       try {
-        const modelExists = await hasModel(DEFAULT_CONFIG.model);
+        const modelExists = await hasModel(config.model);
         if (modelExists) {
-          logger.success(`✓ Model available (${DEFAULT_CONFIG.model})`);
+          logger.success(`✓ Model available (${config.model})`);
         } else {
           logger.warn(
-            `⚠ Model not found — run: ollama pull ${DEFAULT_CONFIG.model}`,
+            `⚠ Model not found — run: ollama pull ${config.model}`,
           );
         }
       } catch {
@@ -108,5 +148,8 @@ export async function initCommand(): Promise<void> {
 
   console.log('');
   logger.info('Setup complete. SculkSense will review staged changes on commit.');
+  if (config.rulesFile || config.customInstructions) {
+    logger.info('Custom review rules are active for this repository.');
+  }
   logger.info('Tip: run `skulksense listen` in another terminal to watch logs.');
 }

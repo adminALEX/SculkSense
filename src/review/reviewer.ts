@@ -1,4 +1,5 @@
 import type { SculkSenseConfig } from '../config/defaults.js';
+import { loadCustomRulesText } from '../config/rules.js';
 import {
   countChangedLines,
   getStagedDiffForFiles,
@@ -90,7 +91,8 @@ export async function reviewStagedChanges(
       modelWarmupMs = await warmModel(config.model);
     }
 
-    const prompt = buildReviewPrompt(truncatedDiff);
+    const customRules = loadCustomRulesText(config, cwd);
+    const prompt = buildReviewPrompt(truncatedDiff, customRules);
     const response = await generate(
       {
         model: config.model,

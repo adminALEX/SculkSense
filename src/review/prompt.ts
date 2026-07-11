@@ -1,4 +1,15 @@
-export function buildReviewPrompt(diff: string): string {
+export function buildReviewPrompt(
+  diff: string,
+  customRules?: string | null,
+): string {
+  const customRulesSection = customRules
+    ? `
+
+PROJECT-SPECIFIC RULES (also enforce these):
+${customRules}
+`
+    : '';
+
   return `You are a strict pre-commit code reviewer. Review ONLY the staged git diff below.
 
 Check in this order. FAIL only when you see clear evidence:
@@ -17,7 +28,7 @@ Rules:
 - Only say "missing await" when an async call is visibly not awaited
 - Do NOT guess. If unsure, respond PASS
 - IGNORE formatting, naming, refactoring, architecture, docs, comments
-
+${customRulesSection}
 Respond with EXACTLY one format:
 
 PASS

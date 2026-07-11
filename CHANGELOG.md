@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config via `skulksense.config.json`
 - Skip logic for infrastructure failures
 
+## [0.2.0] - 2026-07-12
+
+### Added
+
+- Custom review rules via `customInstructions` or `rulesFile` in config
+- Interactive setup during `skulksense init` (asked before Ollama checks)
+- Auto-create `.skulksense-rules.md` template when using a rules file
+- Doctor reports whether custom rules are active
+
 ## [0.1.10] - 2026-07-12
 
 ### Fixed

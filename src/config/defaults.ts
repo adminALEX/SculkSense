@@ -23,4 +23,6 @@ export type SculkSenseConfig = {
   minChangedLines: number;
   maxDiffChars: number;
   ignore: string[];
+  customInstructions?: string;
+  rulesFile?: string;
 };
