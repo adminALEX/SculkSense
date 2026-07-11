@@ -57,7 +57,13 @@ git commit -m "feat: add user service"
 
 ## Viewing logs
 
-Every review writes to `.skulksense/review.log` in your project.
+Every review writes to your user directory (not the project root):
+
+```text
+~/.skulksense/logs/<project-id>/review.log
+```
+
+Each Git project gets its own log file based on its path.
 
 **Terminal 1** — watch logs live while you work:
 
@@ -82,7 +88,7 @@ npx skulksense log --all
 Example log lines:
 
 ```text
-[2026-07-12T00:14:01.234Z] REVIEW_START trigger=commit
+[2026-07-12T00:14:01.234Z] REVIEW_START trigger=commit project=/path/to/your/repo
 [2026-07-12T00:14:02.102Z] REVIEW_PASS duration=868ms model=qwen2.5-coder:1.5b
 ```
 

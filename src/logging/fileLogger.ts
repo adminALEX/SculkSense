@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import {
   appendFileSync,
   closeSync,
@@ -8,14 +9,26 @@ import {
   readSync,
   statSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { homedir } from 'node:os';
+import { join, resolve } from 'node:path';
 import type { ReviewOutcome } from '../review/reviewer.js';
 
-const LOG_DIR = '.skulksense';
+const APP_DIR = '.skulksense';
 const LOG_FILE = 'review.log';
 
+export function getGlobalLogRoot(): string {
+  if (process.env.SKULKSENSE_LOG_DIR) {
+    return process.env.SKULKSENSE_LOG_DIR;
+  }
+  return join(homedir(), APP_DIR, 'logs');
+}
+
+function getProjectId(cwd: string): string {
+  return createHash('sha256').update(resolve(cwd)).digest('hex').slice(0, 16);
+}
+
 export function getLogDir(cwd: string = process.cwd()): string {
-  return join(cwd, LOG_DIR);
+  return join(getGlobalLogRoot(), getProjectId(cwd));
 }
 
 export function getLogPath(cwd: string = process.cwd()): string {
@@ -45,7 +58,10 @@ export function logReviewStart(
   cwd: string = process.cwd(),
   trigger: 'commit' | 'manual' = 'manual',
 ): void {
-  appendLogLine(`REVIEW_START trigger=${trigger}`, cwd);
+  appendLogLine(
+    `REVIEW_START trigger=${trigger} project=${resolve(cwd)}`,
+    cwd,
+  );
 }
 
 export function logReviewOutcome(

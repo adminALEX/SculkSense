@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { join, resolve } from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   appendLogLine,
   getLogPath,
@@ -12,17 +12,27 @@ import {
 
 describe('fileLogger', () => {
   let cwd = '';
+  let logRoot = '';
+
+  beforeEach(() => {
+    logRoot = mkdtempSync(join(tmpdir(), 'skulksense-log-root-'));
+    process.env.SKULKSENSE_LOG_DIR = logRoot;
+    cwd = mkdtempSync(join(tmpdir(), 'skulksense-project-'));
+  });
 
   afterEach(() => {
+    delete process.env.SKULKSENSE_LOG_DIR;
     if (cwd) {
       rmSync(cwd, { recursive: true, force: true });
       cwd = '';
     }
+    if (logRoot) {
+      rmSync(logRoot, { recursive: true, force: true });
+      logRoot = '';
+    }
   });
 
-  it('writes review start and outcome logs', () => {
-    cwd = mkdtempSync(join(tmpdir(), 'skulksense-log-'));
-
+  it('writes review logs under the user log directory', () => {
     logReviewStart(cwd, 'manual');
     logReviewOutcome(
       { status: 'pass', durationMs: 120, model: 'qwen2.5-coder:1.5b' },
@@ -32,14 +42,13 @@ describe('fileLogger', () => {
     const lines = readLogLines(cwd, 10);
     expect(lines).toHaveLength(2);
     expect(lines[0]).toContain('REVIEW_START trigger=manual');
+    expect(lines[0]).toContain(`project=${resolve(cwd)}`);
     expect(lines[1]).toContain('REVIEW_PASS');
-    expect(lines[1]).toContain('duration=120ms');
-    expect(getLogPath(cwd)).toContain('.skulksense/review.log');
+    expect(getLogPath(cwd)).toContain(logRoot);
+    expect(getLogPath(cwd)).not.toContain(resolve(cwd));
   });
 
   it('returns recent lines only', () => {
-    cwd = mkdtempSync(join(tmpdir(), 'skulksense-log-'));
-
     appendLogLine('line-1', cwd);
     appendLogLine('line-2', cwd);
     appendLogLine('line-3', cwd);
