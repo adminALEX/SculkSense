@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -12,6 +12,7 @@ import {
 import { isGitRepository } from '../git/run.js';
 import { isOllamaInstalled, isOllamaRunning } from '../ollama/health.js';
 import { hasModel } from '../ollama/models.js';
+import { ensureLogDir } from '../logging/fileLogger.js';
 import { logger } from '../ui/logger.js';
 
 const execFileAsync = promisify(execFile);
@@ -72,6 +73,25 @@ export async function initCommand(): Promise<void> {
     logger.info(`• Config already exists (${getConfigFilename()})`);
   }
 
+  ensureLogDir(cwd);
+  logger.success('✓ Log directory ready (.skulksense/)');
+
+  const gitignorePath = join(cwd, '.gitignore');
+  const gitignoreEntry = '.skulksense/';
+  if (existsSync(gitignorePath)) {
+    const gitignore = readFileSync(gitignorePath, 'utf-8');
+    if (!gitignore.split('\n').some((line) => line.trim() === gitignoreEntry)) {
+      appendFileSync(
+        gitignorePath,
+        `${gitignore.endsWith('\n') ? '' : '\n'}${gitignoreEntry}\n`,
+      );
+      logger.success('✓ Added .skulksense/ to .gitignore');
+    }
+  } else {
+    writeFileSync(gitignorePath, `${gitignoreEntry}\n`);
+    logger.success('✓ Created .gitignore with .skulksense/');
+  }
+
   const ollamaInstalled = await isOllamaInstalled();
   if (ollamaInstalled) {
     logger.success('✓ Ollama installed');
@@ -102,4 +122,5 @@ export async function initCommand(): Promise<void> {
 
   console.log('');
   logger.info('Setup complete. SculkSense will review staged changes on commit.');
+  logger.info('Tip: run `skulksense listen` in another terminal to watch logs.');
 }

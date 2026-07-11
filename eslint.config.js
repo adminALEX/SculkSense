@@ -19,6 +19,7 @@ export default [
         fetch: 'readonly',
         AbortController: 'readonly',
         AbortSignal: 'readonly',
+        Buffer: 'readonly',
       },
     },
     plugins: {

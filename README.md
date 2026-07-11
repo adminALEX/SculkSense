@@ -50,8 +50,41 @@ git commit -m "feat: add user service"
 | `skulksense init` | Initialize in the current repo |
 | `skulksense review` | Run review manually on staged changes |
 | `skulksense doctor` | Check Git, Husky, Ollama, config, model |
+| `skulksense log` | View recent review logs |
+| `skulksense listen` | Watch logs in real time during commits |
 | `skulksense version` | Show package version |
 | `skulksense --help` | Show help |
+
+## Viewing logs
+
+Every review writes to `.skulksense/review.log` in your project.
+
+**Terminal 1** — watch logs live while you work:
+
+```bash
+npx skulksense listen
+```
+
+**Terminal 2** — commit as usual:
+
+```bash
+git commit -m "feat: add feature"
+```
+
+**View past logs:**
+
+```bash
+npx skulksense log
+npx skulksense log --lines 100
+npx skulksense log --all
+```
+
+Example log lines:
+
+```text
+[2026-07-12T00:14:01.234Z] REVIEW_START trigger=commit
+[2026-07-12T00:14:02.102Z] REVIEW_PASS duration=868ms model=qwen2.5-coder:1.5b
+```
 
 ## Configuration
 

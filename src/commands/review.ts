@@ -1,5 +1,6 @@
 import { loadConfig } from '../config/load.js';
 import { isGitRepository } from '../git/run.js';
+import { logReviewOutcome, logReviewStart } from '../logging/fileLogger.js';
 import { reviewStagedChanges } from '../review/reviewer.js';
 import { colors } from '../ui/colors.js';
 import { logger } from '../ui/logger.js';
@@ -19,7 +20,10 @@ export async function reviewCommand(): Promise<void> {
   const config = await loadConfig(cwd);
   const spinner = createSpinner('Reviewing staged changes...');
 
+  logReviewStart(cwd, process.env.HUSKY ? 'commit' : 'manual');
+
   const outcome = await reviewStagedChanges(config, cwd);
+  logReviewOutcome(outcome, cwd);
   spinner.stop();
 
   if (outcome.status === 'skip') {

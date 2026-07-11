@@ -1,10 +1,10 @@
 {
   "name": "skulksense",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Fast local AI pre-commit review using Ollama — zero API costs, complete code privacy",
   "type": "module",
   "bin": {
-    "skulksense": "./dist/cli.js"
+    "skulksense": "dist/cli.js"
   },
   "files": [
     "dist"
@@ -18,7 +18,8 @@
     "lint": "eslint src tests",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
   "keywords": [
     "git",
@@ -34,7 +35,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adminALEX/SculkSense.git"
+    "url": "git+https://github.com/adminALEX/SculkSense.git"
   },
   "homepage": "https://github.com/adminALEX/SculkSense#readme",
   "bugs": {
