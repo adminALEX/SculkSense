@@ -1,7 +1,43 @@
+# Dependencies
 node_modules/
+
+# Build output (generated before publish)
 dist/
+
+# Test artifacts
 coverage/
+.vitest/
+
+# Logs
 *.log
-.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment and secrets
 .env
 .env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
+
+# Package manager artifacts
+*.tgz
+
+# SkulkSense local repo state (pause marker, etc.)
+.skulksense/
+
+# Local dogfooding config (see examples/ for committed samples)
+skulksense.config.json
+.skulksense-rules.md
